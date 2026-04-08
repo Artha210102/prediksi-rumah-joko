@@ -88,10 +88,15 @@ elif options == "Prediction":
     st.write("Enter the features of the house:")
     input_features = []
     
-    # 2. Buat input form hanya untuk fitur-fitur tersebut
+    # 2. Buat input form dengan format yang sesuai (Integer atau Float)
     for col in features:
-        # Menghitung mean dari kolom numerik ini pasti aman
-        val = st.number_input(f"{col}", value=float(df[col].mean()))
+        if col == 'bathrooms':
+            # Bathrooms di KC House Data bisa desimal (contoh: 1.5, 2.25)
+            val = st.number_input(f"{col}", value=float(df[col].mean()), format="%.2f")
+        else:
+            # Kolom lainnya (bedrooms, sqft, grade, yr_built) jadikan bilangan bulat (Integer)
+            val = st.number_input(f"{col}", value=int(df[col].mean()), step=1)
+            
         input_features.append(val)
 
     # 3. Tambahkan tombol prediksi agar model tidak dilatih ulang setiap kali angka diketik
