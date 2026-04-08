@@ -56,9 +56,17 @@ if options == "Data Exploration":
 elif options == "Model Training":
     st.header("Train the SVR Model")
 
+    # 1. PERBAIKAN: Filter HANYA kolom yang berisi angka (hindari kolom teks seperti 'date')
+    numeric_columns = df.select_dtypes(include=['number']).columns.tolist()
+    
+    # 2. Hapus 'price' dari daftar pilihan karena 'price' adalah hasil yang ingin diprediksi (target)
+    if 'price' in numeric_columns:
+        numeric_columns.remove('price')
+
     # Select features
     features = st.multiselect("Select features for prediction", 
-                               df.columns[:-1], default=['bedrooms', 'bathrooms', 'sqft_living', 'grade', 'yr_built'])
+                               options=numeric_columns, 
+                               default=['bedrooms', 'bathrooms', 'sqft_living', 'grade', 'yr_built'])
 
     x = df[features]
     y = df['price']
