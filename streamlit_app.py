@@ -68,6 +68,14 @@ elif options == "Model Training":
                                options=numeric_columns, 
                                default=['bedrooms', 'bathrooms', 'sqft_living', 'grade', 'yr_built'])
 
+    # --- TAMBAHKAN PENJAGA INI ---
+    if len(features) == 0:
+        st.warning("⚠️ Silakan pilih minimal satu fitur untuk melatih model!")
+        st.stop()  # Menghentikan kode di bawahnya berjalan agar tidak error
+    # -----------------------------
+
+    x = df[features]
+    y = df['price']
     x = df[features]
     y = df['price']
 
