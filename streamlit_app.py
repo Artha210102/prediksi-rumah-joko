@@ -11,9 +11,9 @@ from sklearn.metrics import mean_squared_error, r2_score
 st.title("House Price Prediction using SVR")
 
 # Load data
-@st.cache
+@st.cache_data
 def load_data():
-    return pd.read_csv("/content/kc_house_data.csv")
+    return pd.read_csv("kc_house_data.csv")
 
 df = load_data()
 
