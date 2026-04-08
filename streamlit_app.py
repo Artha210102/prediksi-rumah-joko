@@ -82,19 +82,36 @@ elif options == "Model Training":
 elif options == "Prediction":
     st.header("Predict House Price")
 
+    # 1. Gunakan HANYA fitur yang sama seperti saat melatih model
+    features = ['bedrooms', 'bathrooms', 'sqft_living', 'grade', 'yr_built']
+
     st.write("Enter the features of the house:")
     input_features = []
-    for col in df.columns[:-1]:
+    
+    # 2. Buat input form hanya untuk fitur-fitur tersebut
+    for col in features:
+        # Menghitung mean dari kolom numerik ini pasti aman
         val = st.number_input(f"{col}", value=float(df[col].mean()))
         input_features.append(val)
 
-    input_features = [input_features]
-    scaler = StandardScaler()
-    scaler.fit(df[df.columns[:-1]])
-    input_scaled = scaler.transform(input_features)
+    # 3. Tambahkan tombol prediksi agar model tidak dilatih ulang setiap kali angka diketik
+    if st.button("Predict Price"):
+        input_features = [input_features]
+        
+        # Ambil data X dan y hanya untuk fitur yang relevan
+        X = df[features]
+        y = df['price']
+        
+        # Latih scaler dengan data X yang benar
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+        input_scaled = scaler.transform(input_features)
 
-    svr = SVR(kernel='rbf', C=100, epsilon=0.1)
-    svr.fit(scaler.fit_transform(df[df.columns[:-1]]), df['price'])
-    predicted_price = svr.predict(input_scaled)
+        # Latih model SVR
+        svr = SVR(kernel='rbf', C=100, epsilon=0.1)
+        svr.fit(X_scaled, y)
+        
+        # Lakukan prediksi
+        predicted_price = svr.predict(input_scaled)
 
-    st.write(f"**Predicted Price:** ${predicted_price[0]:,.2f}")
+        st.success(f"**Predicted Price:** ${predicted_price[0]:,.2f}")
