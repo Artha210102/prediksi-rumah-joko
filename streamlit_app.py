@@ -96,15 +96,14 @@ elif options == "Prediction":
     st.write("Enter the features of the house:")
     input_features = []
     
-    # Buat input form dengan format yang "dipaksa" agar rapi
+    # Buat input form dan paksa mulai dari angka 0
     for col in features:
         if col == 'bathrooms':
-            # Bathrooms dibiarkan desimal karena lazim dalam spesifikasi rumah
-            val = st.number_input(f"{col}", value=float(df[col].mean()), step=0.5, format="%.2f")
+            # Bathrooms mulai dari 0.0, format desimal
+            val = st.number_input(f"{col}", value=0.0, step=0.5, format="%.2f")
         else:
-            # Kolom lain dipaksa menjadi bilangan bulat TANPA koma (format="%d")
-            mean_val = int(df[col].mean())
-            val = st.number_input(f"{col}", value=mean_val, step=1, format="%d")
+            # Kolom lainnya mulai dari 0 murni, format integer tanpa koma
+            val = st.number_input(f"{col}", value=0, step=1, format="%d")
             
         input_features.append(val)
 
