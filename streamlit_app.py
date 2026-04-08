@@ -13,6 +13,7 @@ st.title("House Price Prediction using SVR")
 # Load data
 @st.cache_data
 def load_data():
+    # Pastikan file CSV ada di folder yang sama dengan script ini
     return pd.read_csv("kc_house_data.csv")
 
 df = load_data()
@@ -21,7 +22,9 @@ df = load_data()
 st.sidebar.header("Navigation")
 options = st.sidebar.radio("Go to:", ["Data Exploration", "Model Training", "Prediction"])
 
+# ==========================================
 # Data Exploration
+# ==========================================
 if options == "Data Exploration":
     st.header("Exploratory Data Analysis")
 
@@ -43,10 +46,13 @@ if options == "Data Exploration":
 
     st.subheader("Correlation Heatmap")
     fig, ax = plt.subplots(figsize=(10, 6))
+    # Perbaikan: Hanya memproses kolom angka (numeric_only) agar tidak error
     sns.heatmap(df.select_dtypes(include=['number']).corr(), annot=True, cmap="coolwarm", ax=ax)
     st.pyplot(fig)
 
+# ==========================================
 # Model Training
+# ==========================================
 elif options == "Model Training":
     st.header("Train the SVR Model")
 
@@ -78,32 +84,35 @@ elif options == "Model Training":
     st.write(f"Mean Squared Error: {mse:.2f}")
     st.write(f"R² Score: {r2:.2f}")
 
+# ==========================================
 # Prediction
+# ==========================================
 elif options == "Prediction":
     st.header("Predict House Price")
 
-    # 1. Gunakan HANYA fitur yang sama seperti saat melatih model
+    # Gunakan HANYA fitur yang sama seperti saat melatih model
     features = ['bedrooms', 'bathrooms', 'sqft_living', 'grade', 'yr_built']
 
     st.write("Enter the features of the house:")
     input_features = []
     
-    # 2. Buat input form dengan format yang sesuai (Integer atau Float)
+    # Buat input form dengan format yang "dipaksa" agar rapi
     for col in features:
         if col == 'bathrooms':
-            # Bathrooms di KC House Data bisa desimal (contoh: 1.5, 2.25)
-            val = st.number_input(f"{col}", value=float(df[col].mean()), format="%.2f")
+            # Bathrooms dibiarkan desimal karena lazim dalam spesifikasi rumah
+            val = st.number_input(f"{col}", value=float(df[col].mean()), step=0.5, format="%.2f")
         else:
-            # Kolom lainnya (bedrooms, sqft, grade, yr_built) jadikan bilangan bulat (Integer)
-            val = st.number_input(f"{col}", value=int(df[col].mean()), step=1)
+            # Kolom lain dipaksa menjadi bilangan bulat TANPA koma (format="%d")
+            mean_val = int(df[col].mean())
+            val = st.number_input(f"{col}", value=mean_val, step=1, format="%d")
             
         input_features.append(val)
 
-    # 3. Tambahkan tombol prediksi agar model tidak dilatih ulang setiap kali angka diketik
+    # Tambahkan tombol prediksi agar aplikasi tidak lag
     if st.button("Predict Price"):
         input_features = [input_features]
         
-        # Ambil data X dan y hanya untuk fitur yang relevan
+        # Ambil data X dan y
         X = df[features]
         y = df['price']
         
@@ -112,11 +121,11 @@ elif options == "Prediction":
         X_scaled = scaler.fit_transform(X)
         input_scaled = scaler.transform(input_features)
 
-        # Latih model SVR
-        svr = SVR(kernel='rbf', C=100, epsilon=0.1)
-        svr.fit(X_scaled, y)
-        
-        # Lakukan prediksi
-        predicted_price = svr.predict(input_scaled)
+        # Memunculkan animasi loading selagi model memproses
+        with st.spinner("Training model and calculating prediction..."):
+            svr = SVR(kernel='rbf', C=100, epsilon=0.1)
+            svr.fit(X_scaled, y)
+            predicted_price = svr.predict(input_scaled)
 
-        st.success(f"**Predicted Price:** ${predicted_price[0]:,.2f}")
+        # Perbaikan: Hilangkan koma pada hasil akhir dengan membulatkannya ke int() dan format ,.0f
+        st.success(f"**Predicted Price:** ${int(predicted_price[0]):,.0f}")
