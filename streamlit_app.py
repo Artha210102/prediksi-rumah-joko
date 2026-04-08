@@ -43,7 +43,7 @@ if options == "Data Exploration":
 
     st.subheader("Correlation Heatmap")
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.heatmap(df.corr(), annot=True, cmap="coolwarm", ax=ax)
+    sns.heatmap(df.select_dtypes(include=['number']).corr(), annot=True, cmap="coolwarm", ax=ax)
     st.pyplot(fig)
 
 # Model Training
