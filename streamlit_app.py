@@ -112,14 +112,14 @@ elif options == "Prediction":
     st.write("Enter the features of the house:")
     input_features = []
     
-    # Buat input form dan paksa mulai dari angka 0
+    # Buat input form dan paksa mulai dari 0, SERTA cegah angka minus
     for col in features:
         if col == 'bathrooms':
-            # Bathrooms mulai dari 0.0, format desimal
-            val = st.number_input(f"{col}", value=0.0, step=0.5, format="%.2f")
+            # Tambahkan min_value=0.0 agar tidak bisa minus
+            val = st.number_input(f"{col}", min_value=0.0, value=0.0, step=0.5, format="%.2f")
         else:
-            # Kolom lainnya mulai dari 0 murni, format integer tanpa koma
-            val = st.number_input(f"{col}", value=0, step=1, format="%d")
+            # Tambahkan min_value=0 untuk kolom integer agar tidak bisa minus
+            val = st.number_input(f"{col}", min_value=0, value=0, step=1, format="%d")
             
         input_features.append(val)
 
